@@ -82,6 +82,23 @@ export default function RegisterPage() {
                   className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#2c4e85] focus:ring-1 focus:ring-[#2c4e85]"
                 />
               </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Confirm Password
+                </label>
+
+                <input
+                  id="password"
+                  type="text"
+                  placeholder="********"
+                  required
+                  className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#2c4e85] focus:ring-1 focus:ring-[#2c4e85]"
+                />
+              </div>
               <button
                 type="submit"
                 disabled={isLoading}
