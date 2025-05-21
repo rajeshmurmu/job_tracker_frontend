@@ -1,6 +1,9 @@
 import { Briefcase, Calendar, CheckCircle } from "lucide-react";
 import BarChart from "../../components/dashboard/BarChart";
+import useUserStore from "../../store/store";
 export default function DashboardPage() {
+  const { user } = useUserStore((state) => state);
+  console.log(user);
   // Sample data for the chart
   const chartData = {
     labels: ["January", "February", "March", "April", "May", "June"],

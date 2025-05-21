@@ -1,23 +1,64 @@
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { Briefcase } from "lucide-react";
+import { Briefcase, Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+
+import { useMutation } from "@tanstack/react-query";
+import { registerUser } from "../../utils/auth-api-client";
+import { toast } from "react-toastify";
+import { vineResolver } from "../../utils/vine";
+import { registerSchema } from "../../utils/registerSchema";
+import useUserStore from "../../store/store";
 
 export default function RegisterPage() {
+  const { user } = useUserStore((state) => state);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const mutation = useMutation({
+    mutationFn: registerUser,
+    onSuccess: (data) => {
+      if (data?.success === false) {
+        console.log(data);
+        toast.error(data?.message || "Something went wrong");
+      } else {
+        toast.success(data?.message || "User registered successfully");
+        navigate("/login", { replace: true });
+      }
+    },
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      password_confirmation: "",
+    },
+    resolver: vineResolver(registerSchema),
+  });
 
-    // Simulate login - in a real app, you would validate credentials
-    setTimeout(() => {
+  const onSubmit = async (data) => {
+    try {
+      setIsLoading(true);
+      mutation.mutate({ ...data, confirmPassword: data.password });
+    } catch (error) {
+      console.error("Error registering user:", error);
+    } finally {
       setIsLoading(false);
-      navigate("/dashboard");
-    }, 1000);
+      reset();
+    }
   };
+
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate, user]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50">
@@ -33,7 +74,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="mt-6">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-4">
               <div className="space-y-2">
                 <label
@@ -46,9 +87,12 @@ export default function RegisterPage() {
                   id="name"
                   type="text"
                   placeholder="John Doe"
-                  required
+                  {...register("name")}
                   className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#2c4e85] focus:ring-1 focus:ring-[#2c4e85]"
                 />
+                {errors.name && (
+                  <p className="text-xs text-red-500">{errors.name.message}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -62,9 +106,12 @@ export default function RegisterPage() {
                   id="email"
                   type="email"
                   placeholder="name@example.com"
-                  required
+                  {...register("email")}
                   className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#2c4e85] focus:ring-1 focus:ring-[#2c4e85]"
                 />
+                {errors.email && (
+                  <p className="text-xs text-red-500">{errors.email.message}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <label
@@ -78,33 +125,40 @@ export default function RegisterPage() {
                   id="password"
                   type="password"
                   placeholder="********"
-                  required
+                  {...register("password")}
                   className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#2c4e85] focus:ring-1 focus:ring-[#2c4e85]"
                 />
               </div>
 
               <div className="space-y-2">
                 <label
-                  htmlFor="password"
+                  htmlFor="confirm_password"
                   className="block text-sm font-medium text-slate-700"
                 >
                   Confirm Password
                 </label>
 
                 <input
-                  id="password"
+                  id="confirm_password"
                   type="text"
                   placeholder="********"
-                  required
+                  {...register("password_confirmation")}
                   className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#2c4e85] focus:ring-1 focus:ring-[#2c4e85]"
                 />
+
+                {errors.password && (
+                  <p className="text-xs text-red-500">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full rounded-md bg-[#2c4e85] px-4 py-2 text-sm font-medium text-white hover:bg-[#254170] focus:outline-none focus:ring-2 focus:ring-[#2c4e85] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full rounded-md bg-[#2c4e85] px-4 py-2 text-sm font-medium text-white hover:bg-[#254170] focus:outline-none focus:ring-2 focus:ring-[#2c4e85] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
-                {isLoading ? "Logging in..." : "Login"}
+                {isLoading && <Loader2 className="mr-2 animate-spin" />}
+                Register
               </button>
             </div>
           </form>
