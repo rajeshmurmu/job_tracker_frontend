@@ -2,9 +2,9 @@ import { create } from "zustand";
 import { persist, createJSONStorage, devtools } from "zustand/middleware";
 
 const userStore = (set) => ({
-  user: {},
+  user: null,
   setUser: (data) => set(() => ({ user: data })),
-  resetUser: () => set(() => ({ user: {} })),
+  resetUser: () => set(() => ({ user: null })),
 });
 
 const useUserStore = create(

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Briefcase, FilePlus, Home, LogOut, Menu, User, X } from "lucide-react";
+import useUserStore from "../../store/store";
 
 const navItems = [
   {
@@ -26,12 +27,14 @@ const navItems = [
 ];
 
 export function DashboardSidebar() {
+  const { resetUser } = useUserStore((state) => state);
   const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
     // In a real app, you would handle logout logic here
+    resetUser();
     navigate("/");
   };
 
