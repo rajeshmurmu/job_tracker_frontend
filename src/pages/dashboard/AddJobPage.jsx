@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { format } from "date-fns";
 import "react-day-picker/dist/style.css";
 import { useForm } from "react-hook-form";
-import DatePicker from "../../components/DatePicker";
+import DatePicker from "../../components/dashboard/DatePicker";
 import { Loader2 } from "lucide-react";
 import { vineResolver } from "../../utils/vine";
 import { jobSchema } from "../../utils/jobSchema";
