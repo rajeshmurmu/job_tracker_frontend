@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Briefcase, FilePlus, Home, LogOut, Menu, User, X } from "lucide-react";
 import useUserStore from "../../store/store";
+import { useMutation } from "@tanstack/react-query";
+import { logoutUser } from "../../utils/auth-api-client";
+import { toast } from "react-toastify";
 
 const navItems = [
   {
@@ -32,11 +35,20 @@ export function DashboardSidebar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleLogout = () => {
-    // In a real app, you would handle logout logic here
-    resetUser();
-    navigate("/");
-  };
+  const { mutate, isSuccess, data } = useMutation({
+    mutationKey: ["logout"],
+    mutationFn: () => {
+      return logoutUser();
+    },
+  });
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data?.message || "User logged out successfully");
+      resetUser();
+      navigate("/login", { replace: true });
+    }
+  }, [data?.message, isSuccess, navigate, resetUser]);
 
   return (
     <>
@@ -96,7 +108,7 @@ export function DashboardSidebar() {
             <div className="p-4 border-t border-[#254170]">
               <button
                 className="w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-[#254170] transition-colors"
-                onClick={handleLogout}
+                onClick={mutate}
               >
                 <LogOut className="h-5 w-5" />
                 Logout
@@ -134,7 +146,7 @@ export function DashboardSidebar() {
           <div className="p-4 border-t border-[#254170]">
             <button
               className="w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-[#254170] transition-colors"
-              onClick={handleLogout}
+              onClick={mutate}
             >
               <LogOut className="h-5 w-5" />
               Logout

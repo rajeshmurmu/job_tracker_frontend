@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { Briefcase, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -12,7 +12,6 @@ import useUserStore from "../../store/store";
 export default function LoginPage() {
   const { setUser, user } = useUserStore((state) => state);
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -27,36 +26,36 @@ export default function LoginPage() {
     resolver: vineResolver(loginSchema),
   });
 
-  const mutation = useMutation({
+  const { mutate, data, isPending, isSuccess, isError, error } = useMutation({
+    mutationKey: ["login"],
     mutationFn: loginUser,
-    onSuccess: (data) => {
-      if (data?.success === false) {
-        console.log(data);
-        toast.error(data?.message || "Something went wrong");
-        console.log(data);
-      } else {
-        toast.success(data?.message || "User login successfully");
-        setUser({
-          ...data?.user,
-          accessToken: data?.accessToken,
-          refreshToken: data?.refreshToken,
-        });
-        navigate("/dashboard", { replace: true });
-      }
-    },
   });
 
   const onSubmit = async (data) => {
-    try {
-      setIsLoading(true);
-      mutation.mutate(data);
-    } catch (error) {
-      console.error("Error registering user:", error);
-    } finally {
-      setIsLoading(false);
-      reset();
-    }
+    mutate(data);
   };
+
+  useEffect(() => {
+    if (data && isSuccess) {
+      setUser({
+        ...data?.user,
+        accessToken: data?.accessToken,
+        refreshToken: data?.refreshToken,
+      });
+      toast.success(data?.message || "User logged in successfully");
+      navigate("/dashboard", { replace: true });
+    }
+
+    if (isError) {
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Something went wrong"
+      );
+    }
+
+    reset();
+  }, [data, error, isError, isSuccess, navigate, reset, setUser, user]);
 
   useEffect(() => {
     if (user) {
@@ -128,10 +127,12 @@ export default function LoginPage() {
 
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isPending}
                 className="w-full rounded-md bg-[#2c4e85] px-4 py-2 text-sm font-medium text-white hover:bg-[#254170] focus:outline-none focus:ring-2 focus:ring-[#2c4e85] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading && <Loader2 className="mr-2 animate-spin" />}
+                {isPending && (
+                  <Loader2 className="inline-block mr-2 animate-spin" />
+                )}
                 Login
               </button>
             </div>
