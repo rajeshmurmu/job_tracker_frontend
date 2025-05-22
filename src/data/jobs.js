@@ -1,0 +1,51 @@
+// Sample job data
+export const jobs = [
+  {
+    id: 1,
+    company: "Acme Inc",
+    position: "Frontend Developer",
+    location: "New York, NY",
+    status: "Applied",
+    appliedDate: "2023-05-01",
+  },
+  {
+    id: 2,
+    company: "Globex Corp",
+    position: "Full Stack Engineer",
+    location: "Remote",
+    status: "Interview",
+    appliedDate: "2023-05-05",
+  },
+  {
+    id: 3,
+    company: "Stark Industries",
+    position: "UI/UX Designer",
+    location: "San Francisco, CA",
+    status: "Offer",
+    appliedDate: "2023-04-20",
+  },
+  {
+    id: 4,
+    company: "Wayne Enterprises",
+    position: "Product Manager",
+    location: "Chicago, IL",
+    status: "Rejected",
+    appliedDate: "2023-04-15",
+  },
+  {
+    id: 5,
+    company: "Umbrella Corp",
+    position: "Backend Developer",
+    location: "Austin, TX",
+    status: "Applied",
+    appliedDate: "2023-05-10",
+  },
+  {
+    id: 6,
+    company: "Cyberdyne Systems",
+    position: "DevOps Engineer",
+    location: "Seattle, WA",
+    status: "Interview",
+    appliedDate: "2023-04-28",
+  },
+];

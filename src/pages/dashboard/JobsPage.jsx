@@ -1,98 +1,70 @@
-import { useState } from "react";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Search,
-} from "lucide-react";
-
-// Sample job data
-const jobs = [
-  {
-    id: 1,
-    company: "Acme Inc",
-    position: "Frontend Developer",
-    location: "New York, NY",
-    status: "Applied",
-    appliedDate: "2023-05-01",
-  },
-  {
-    id: 2,
-    company: "Globex Corp",
-    position: "Full Stack Engineer",
-    location: "Remote",
-    status: "Interview",
-    appliedDate: "2023-05-05",
-  },
-  {
-    id: 3,
-    company: "Stark Industries",
-    position: "UI/UX Designer",
-    location: "San Francisco, CA",
-    status: "Offer",
-    appliedDate: "2023-04-20",
-  },
-  {
-    id: 4,
-    company: "Wayne Enterprises",
-    position: "Product Manager",
-    location: "Chicago, IL",
-    status: "Rejected",
-    appliedDate: "2023-04-15",
-  },
-  {
-    id: 5,
-    company: "Umbrella Corp",
-    position: "Backend Developer",
-    location: "Austin, TX",
-    status: "Applied",
-    appliedDate: "2023-05-10",
-  },
-  {
-    id: 6,
-    company: "Cyberdyne Systems",
-    position: "DevOps Engineer",
-    location: "Seattle, WA",
-    status: "Interview",
-    appliedDate: "2023-04-28",
-  },
-];
+import { useCallback, useEffect, useState } from "react";
+import { Loader2, Search } from "lucide-react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { fetchJobs } from "../../utils/job-api-client";
+import StatusFilterDropDown from "../../components/dashboard/StatusFilterDropDown";
+import SortDropDown from "../../components/dashboard/SortDropDown";
+import JobsPagination from "../../components/dashboard/JobsPagination";
+import { useSearchParams } from "react-router";
+import _config from "../../config/appConfig";
 
 export default function JobsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
-  const [sortMenuOpen, setSortMenuOpen] = useState(false);
-  const [statusMenuOpen, setStatusMenuOpen] = useState(false);
+  const [filteredJobs, setFilteredJobs] = useState([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const page = Number(searchParams.get("page")) || 1;
 
-  // Filter and sort jobs
-  const filteredJobs = jobs
-    .filter((job) => {
-      const matchesSearch =
-        job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.location.toLowerCase().includes(searchTerm.toLowerCase());
+  const { data, isPending } = useQuery({
+    queryKey: ["jobs"],
+    queryFn: async () => {
+      return await fetchJobs();
+    },
+    staleTime: 60 * 1000 * 5, // 5 minutes
+    placeholderData: keepPreviousData,
+  });
 
-      const matchesStatus =
-        statusFilter === "All" || job.status === statusFilter;
+  const filterAndSortJobs = useCallback(() => {
+    // Filter and sort jobs
+    const result = data?.jobs
+      ?.filter((job) => {
+        const matchesSearch =
+          job.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.location.toLowerCase().includes(searchTerm.toLowerCase());
 
-      return matchesSearch && matchesStatus;
-    })
-    .sort((a, b) => {
-      if (sortBy === "newest") {
-        return (
-          new Date(b.appliedDate).getTime() - new Date(a.appliedDate).getTime()
-        );
-      } else if (sortBy === "oldest") {
-        return (
-          new Date(a.appliedDate).getTime() - new Date(b.appliedDate).getTime()
-        );
-      } else if (sortBy === "company") {
-        return a.company.localeCompare(b.company);
-      }
-      return 0;
-    });
+        const matchesStatus =
+          statusFilter === "All" || job.status === statusFilter;
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => {
+        if (sortBy === "newest") {
+          const dateB = new Date(b.applied_date);
+          const dateA = new Date(a.applied_date);
+          // console.log();
+          return dateB - dateA;
+        } else if (sortBy === "oldest") {
+          const dateB = new Date(b.applied_date);
+          const dateA = new Date(a.applied_date);
+          return dateA - dateB;
+        } else if (sortBy === "company_name") {
+          return a.company_name.localeCompare(b.company_name);
+        }
+        return 0;
+      });
+
+    // reset all state values and set filtered jobs
+    setFilteredJobs(result);
+    setTotalPages(Math.ceil(result?.length / _config.jobs_per_page));
+    setCurrentPage(1);
+  }, [data?.jobs, searchTerm, sortBy, statusFilter]);
+
+  useEffect(() => {
+    filterAndSortJobs();
+  }, [searchTerm, sortBy, statusFilter, filterAndSortJobs]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -109,6 +81,24 @@ export default function JobsPage() {
     }
   };
 
+  useEffect(() => {
+    setSearchParams((prev) => {
+      prev.set("page", currentPage);
+      return prev;
+    });
+  }, [currentPage, page, setSearchParams]);
+
+  if (isPending) {
+    return (
+      <div className="w-full h-[770px] flex items-center justify-center">
+        <div className="flex flex-col justify-center items-center">
+          <Loader2 className="animate-spin size-14" color="#2c4e85" />
+          <p>Please wait while getting your jobs</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -116,7 +106,7 @@ export default function JobsPage() {
         <p className="text-slate-500">Manage and track your job applications</p>
       </div>
 
-      <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
         <div className="p-4 border-b border-slate-200">
           <h3 className="font-medium">Job Applications</h3>
         </div>
@@ -128,7 +118,7 @@ export default function JobsPage() {
               </div>
               <input
                 type="text"
-                placeholder="Search jobs..."
+                placeholder="Search jobs by company name, position, or location..."
                 className="w-full rounded-md border border-slate-200 pl-8 pr-3 py-2 text-sm outline-none focus:border-[#2c4e85] focus:ring-1 focus:ring-[#2c4e85]"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -136,87 +126,17 @@ export default function JobsPage() {
             </div>
             <div className="flex gap-2">
               {/* Status Filter Dropdown */}
-              <div className="relative">
-                <button
-                  className="flex items-center justify-between w-[140px] rounded-md border border-slate-200 px-3 py-2 text-sm bg-white"
-                  onClick={() => setStatusMenuOpen(!statusMenuOpen)}
-                >
-                  <span>
-                    {statusFilter === "All" ? "All Statuses" : statusFilter}
-                  </span>
-                  <ChevronDown className="h-4 w-4 ml-2" />
-                </button>
-                {statusMenuOpen && (
-                  <div className="absolute z-10 mt-1 w-full rounded-md border border-slate-200 bg-white shadow-lg">
-                    <div className="py-1">
-                      {["All", "Applied", "Interview", "Offer", "Rejected"].map(
-                        (status) => (
-                          <button
-                            key={status}
-                            className="block w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
-                            onClick={() => {
-                              setStatusFilter(status);
-                              setStatusMenuOpen(false);
-                            }}
-                          >
-                            {status === "All" ? "All Statuses" : status}
-                          </button>
-                        )
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <StatusFilterDropDown
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
+              />
 
               {/* Sort Dropdown */}
-              <div className="relative">
-                <button
-                  className="flex items-center justify-between rounded-md border border-slate-200 px-3 py-2 text-sm bg-white"
-                  onClick={() => setSortMenuOpen(!sortMenuOpen)}
-                >
-                  <div className="flex items-center">
-                    <ArrowUpDown className="mr-2 h-4 w-4" />
-                    <span>Sort</span>
-                  </div>
-                  <ChevronDown className="h-4 w-4 ml-2" />
-                </button>
-                {sortMenuOpen && (
-                  <div className="absolute right-0 z-10 mt-1 w-48 rounded-md border border-slate-200 bg-white shadow-lg">
-                    <div className="py-1">
-                      <button
-                        className="block w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
-                        onClick={() => {
-                          setSortBy("newest");
-                          setSortMenuOpen(false);
-                        }}
-                      >
-                        Newest first
-                      </button>
-                      <button
-                        className="block w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
-                        onClick={() => {
-                          setSortBy("oldest");
-                          setSortMenuOpen(false);
-                        }}
-                      >
-                        Oldest first
-                      </button>
-                      <button
-                        className="block w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
-                        onClick={() => {
-                          setSortBy("company");
-                          setSortMenuOpen(false);
-                        }}
-                      >
-                        Company name
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <SortDropDown sortBy={sortBy} setSortBy={setSortBy} />
             </div>
           </div>
 
+          {/* Jobs Table */}
           <div className="rounded-md border border-slate-200 overflow-hidden">
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50">
@@ -254,32 +174,37 @@ export default function JobsPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-slate-200">
-                {filteredJobs.map((job) => (
-                  <tr key={job.id} className="hover:bg-slate-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
-                      {job.company}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                      {job.position}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 hidden md:table-cell">
-                      {job.location}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${getStatusColor(
-                          job.status
-                        )}`}
-                      >
-                        {job.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 hidden md:table-cell">
-                      {new Date(job.appliedDate).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-                {filteredJobs.length === 0 && (
+                {filteredJobs
+                  ?.slice(
+                    (page - 1) * _config.jobs_per_page,
+                    page * _config.jobs_per_page
+                  )
+                  .map((job) => (
+                    <tr key={job?._id} className="hover:bg-slate-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                        {job?.company_name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                        {job?.position}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 hidden md:table-cell">
+                        {job?.location}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${getStatusColor(
+                            job?.status
+                          )}`}
+                        >
+                          {job.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 hidden md:table-cell">
+                        {new Date(job?.applied_date).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                {filteredJobs?.length === 0 && (
                   <tr>
                     <td
                       colSpan={5}
@@ -293,46 +218,20 @@ export default function JobsPage() {
             </table>
           </div>
 
-          <div className="mt-4 flex items-center justify-center">
-            <nav
-              className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
-              aria-label="Pagination"
-            >
-              <a
-                href="#"
-                className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50"
-              >
-                <span className="sr-only">Previous</span>
-                <ChevronLeft className="h-5 w-5" />
-              </a>
-              <a
-                href="#"
-                aria-current="page"
-                className="z-10 bg-[#2c4e85] border-[#2c4e85] text-white relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-              >
-                1
-              </a>
-              <a
-                href="#"
-                className="bg-white border-slate-300 text-slate-500 hover:bg-slate-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-              >
-                2
-              </a>
-              <a
-                href="#"
-                className="bg-white border-slate-300 text-slate-500 hover:bg-slate-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-              >
-                3
-              </a>
-              <a
-                href="#"
-                className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50"
-              >
-                <span className="sr-only">Next</span>
-                <ChevronRight className="h-5 w-5" />
-              </a>
-            </nav>
-          </div>
+          {/* Pagination */}
+          <JobsPagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
+          {/* {data?.jobs?.length > _config.jobs_per_page &&
+            statusFilter === "All" && (
+              <JobsPagination filteredJobs={data?.jobs} />
+            )}
+
+          {filteredJobs?.length > 0 && statusFilter !== "All" && (
+            <JobsPagination filteredJobs={filteredJobs} />
+          )} */}
         </div>
       </div>
     </div>

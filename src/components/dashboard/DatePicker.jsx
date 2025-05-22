@@ -16,7 +16,7 @@ export default function DatePicker({ date, setDate, control, name }) {
       >
         <CalendarIcon className="mr-2 h-4 w-4 text-slate-500" />
         <span className={date ? "text-slate-900" : "text-slate-500"}>
-          {date ? format(date, "dd-MM-yyyy") : "Select date"}
+          {date ? format(date, "yyyy-MM-dd") : "Select date"}
         </span>
       </button>
       {showDatePicker && (
