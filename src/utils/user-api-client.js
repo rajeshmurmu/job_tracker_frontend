@@ -27,3 +27,48 @@ export const fetchUser = async () => {
     console.log("Error fetching user:", error);
   }
 };
+
+export const updateUser = async (data) => {
+  try {
+    const response = await authApi.put("/me", data);
+
+    if (response.data.success === false) {
+      throw new Error(response.data.message);
+    }
+
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.log("Error updating user:", error);
+      throw new Error(
+        error.response.data.message || "Error occured while updating user"
+      );
+    }
+    console.log("Error updating user:", error);
+    throw new Error(error.message || "Error occured while updating user");
+  }
+};
+
+export const uploadAvatar = async (data) => {
+  try {
+    const response = await authApi.put("/me/avatar", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    if (response.data.success === false) {
+      throw new Error(response.data.message);
+    }
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.log("Error updating user:", error);
+      throw new Error(
+        error.response.data.message || "Error occured while updating user"
+      );
+    }
+    console.log("Error updating user:", error);
+    throw new Error(error.message || "Error occured while updating user");
+  }
+};
