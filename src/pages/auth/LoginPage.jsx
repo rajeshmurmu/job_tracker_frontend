@@ -36,7 +36,7 @@ export default function LoginPage() {
   };
 
   useEffect(() => {
-    if (data && isSuccess) {
+    if (isSuccess) {
       setUser({
         ...data?.user,
         accessToken: data?.accessToken,
@@ -55,7 +55,19 @@ export default function LoginPage() {
     }
 
     reset();
-  }, [data, error, isError, isSuccess, navigate, reset, setUser, user]);
+  }, [
+    data?.accessToken,
+    data?.message,
+    data?.refreshToken,
+    data?.user,
+    error?.message,
+    error?.response?.data?.message,
+    isError,
+    isSuccess,
+    navigate,
+    reset,
+    setUser,
+  ]);
 
   useEffect(() => {
     if (user) {

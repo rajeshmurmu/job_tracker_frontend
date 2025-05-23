@@ -125,7 +125,7 @@ export function DashboardSidebar() {
             <Link to={"/"}>
               <h2 className="text-xl font-bold text-white flex items-center">
                 <Briefcase className="mr-2 h-6 w-6" />
-                Job Tracker
+                <span>Job Tracker</span>
               </h2>
             </Link>
           </div>

@@ -1,28 +1,43 @@
-import { useState } from "react";
-import { Link } from "react-router";
-import {
-  Briefcase,
-  CheckCircle,
-  BarChart2,
-  Search,
-  ArrowRight,
-  Menu,
-  X,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { Briefcase, Menu, X } from "lucide-react";
 import useUserStore from "../store/store";
+import { toast } from "react-toastify";
+import { logoutUser } from "../utils/auth-api-client";
+import { useMutation } from "@tanstack/react-query";
 export default function Header() {
-  const { user } = useUserStore((state) => state);
+  const navigate = useNavigate();
+  const { user, resetUser } = useUserStore((state) => state);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const { mutate, isSuccess, data } = useMutation({
+    mutationKey: ["logout"],
+    mutationFn: () => {
+      return logoutUser();
+    },
+  });
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data?.message || "User logged out successfully");
+      resetUser();
+      navigate("/login", { replace: true });
+    }
+  }, [data?.message, isSuccess, navigate, resetUser]);
   return (
     <>
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Briefcase className="h-8 w-8 text-[#2c4e85]" />
-              <span className="ml-2 text-xl font-bold text-slate-900">
-                JobTracker
-              </span>
+              <Link to="/">
+                <h2 className="text-xl font-bold text-white flex items-center">
+                  <Briefcase className="h-8 w-8 text-[#2c4e85]" />
+                  <span className="ml-2 text-xl font-bold text-slate-900">
+                    JobTracker
+                  </span>
+                </h2>
+              </Link>
             </div>
             <div className="hidden md:flex items-center space-x-4">
               <a
@@ -66,7 +81,10 @@ export default function Header() {
                   >
                     Dashboard
                   </Link>
-                  <button className="px-4 py-2 rounded-md text-sm font-medium text-[#2c4e85] border border-red-500 hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2c4e85] cursor-pointer">
+                  <button
+                    className="px-4 py-2 rounded-md text-sm font-medium text-[#2c4e85] border border-red-500 hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2c4e85] cursor-pointer"
+                    onClick={mutate}
+                  >
                     Logout
                   </button>
                 </>

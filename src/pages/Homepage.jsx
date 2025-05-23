@@ -1,23 +1,16 @@
-import { Link } from "react-router";
+import React from "react";
+import { dashboard } from "../assets/images";
 import {
   Briefcase,
   CheckCircle,
   BarChart2,
   Search,
   ArrowRight,
-  Menu,
-  X,
 } from "lucide-react";
-import Footer from "../components/Footer";
-import Header from "../components/Header";
-import { dashboard } from "../assets/images";
-
-export default function HomePage() {
+import { Link } from "react-router";
+export default function Homepage() {
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Navigation */}
-      <Header />
-
+    <>
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-slate-50 to-white py-12 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -402,9 +395,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <Footer />
-    </div>
+    </>
   );
 }

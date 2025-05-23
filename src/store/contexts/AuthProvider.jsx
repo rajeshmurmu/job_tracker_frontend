@@ -27,7 +27,7 @@ export default function AuthProvider({ children }) {
     if (user) {
       refreshToken();
     }
-  }, [user]);
+  }, []);
 
   if (loading) {
     return <NetworkLoading description="Loading..." />;

@@ -8,12 +8,17 @@ import ProfilePage from "./pages/dashboard/ProfilePage";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import usePageTitle from "./utils/usePageTitle";
+import ContactPage from "./pages/ContactPage";
+import PageLayout from "./pages/PageLayout";
 
 function App() {
   usePageTitle();
   return (
     <Routes>
-      <Route index path="/" element={<Homepage />} />
+      <Route path="/" element={<PageLayout />}>
+        <Route index element={<Homepage />} />
+        <Route path="/contact" element={<ContactPage />} />
+      </Route>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/dashboard" element={<DashboardLayout />}>
