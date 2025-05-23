@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
-import { Loader2, Search } from "lucide-react";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { fetchJobs } from "../../utils/job-api-client";
+import { Search } from "lucide-react";
 import StatusFilterDropDown from "../../components/dashboard/StatusFilterDropDown";
 import SortDropDown from "../../components/dashboard/SortDropDown";
 import JobsPagination from "../../components/dashboard/JobsPagination";
 import { useSearchParams } from "react-router";
 import _config from "../../config/appConfig";
+import { useApplicationStore } from "../../store/store";
 
 export default function JobsPage() {
+  const { applications } = useApplicationStore();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -18,18 +18,9 @@ export default function JobsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const page = Number(searchParams.get("page")) || 1;
 
-  const { data, isPending } = useQuery({
-    queryKey: ["jobs"],
-    queryFn: async () => {
-      return await fetchJobs();
-    },
-    staleTime: 60 * 1000 * 5, // 5 minutes
-    placeholderData: keepPreviousData,
-  });
-
   const filterAndSortJobs = useCallback(() => {
     // Filter and sort jobs
-    const result = data?.jobs
+    const result = applications
       ?.filter((job) => {
         const matchesSearch =
           job.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -60,7 +51,7 @@ export default function JobsPage() {
     setFilteredJobs(result);
     setTotalPages(Math.ceil(result?.length / _config.jobs_per_page));
     setCurrentPage(1);
-  }, [data?.jobs, searchTerm, sortBy, statusFilter]);
+  }, [applications, searchTerm, sortBy, statusFilter]);
 
   useEffect(() => {
     filterAndSortJobs();
@@ -87,17 +78,6 @@ export default function JobsPage() {
       return prev;
     });
   }, [currentPage, page, setSearchParams]);
-
-  if (isPending) {
-    return (
-      <div className="w-full h-[770px] flex items-center justify-center">
-        <div className="flex flex-col justify-center items-center">
-          <Loader2 className="animate-spin size-14" color="#2c4e85" />
-          <p>Please wait while getting your jobs</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

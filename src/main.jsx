@@ -6,7 +6,7 @@ import App from "./App";
 import { ToastContainer } from "react-toastify";
 import AuthProvider from "./store/contexts/AuthProvider";
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 createRoot(document.getElementById("root")).render(
   <AuthProvider>
     <BrowserRouter>

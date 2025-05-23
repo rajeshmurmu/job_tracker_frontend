@@ -1,4 +1,4 @@
-import { Navigate, Outlet, Route, Routes } from "react-router";
+import { Navigate, Route, Routes } from "react-router";
 import { DashboardLayout } from "./pages/dashboard/DashboardLayout";
 import Homepage from "./pages/Homepage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
@@ -7,7 +7,7 @@ import AddJobPage from "./pages/dashboard/AddJobPage";
 import ProfilePage from "./pages/dashboard/ProfilePage";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
-import usePageTitle from "./utils/usePageTitle";
+import usePageTitle from "./hooks/usePageTitle";
 import ContactPage from "./pages/ContactPage";
 import PageLayout from "./pages/PageLayout";
 

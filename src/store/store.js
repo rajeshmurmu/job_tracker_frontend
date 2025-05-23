@@ -16,4 +16,19 @@ const useUserStore = create(
   )
 );
 
+const applicationStore = (set) => ({
+  applications: null,
+  setApplication: (data) => set(() => ({ applications: data })),
+  resetApplication: () => set(() => ({ applications: null })),
+});
+
+export const useApplicationStore = create(
+  devtools(
+    persist(applicationStore, {
+      name: "applications",
+      storage: createJSONStorage(() => localStorage),
+    })
+  )
+);
+
 export default useUserStore;

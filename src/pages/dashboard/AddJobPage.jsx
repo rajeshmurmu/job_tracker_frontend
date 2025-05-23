@@ -7,9 +7,10 @@ import DatePicker from "../../components/dashboard/DatePicker";
 import { Loader2 } from "lucide-react";
 import { vineResolver } from "../../utils/vine";
 import { jobSchema } from "../../utils/jobSchema";
-import { useMutation } from "@tanstack/react-query";
+import { QueryClient, useMutation } from "@tanstack/react-query";
 import { createJob } from "../../utils/job-api-client";
 import { toast } from "react-toastify";
+import { queryClient } from "../../main";
 
 export default function AddJobPage() {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ export default function AddJobPage() {
   useEffect(() => {
     if (isSuccess) {
       reset();
+      queryClient.invalidateQueries(["fetch-jobs"]);
       toast.success(data?.message || "Job created successfully");
       navigate("/dashboard", { replace: true });
     }

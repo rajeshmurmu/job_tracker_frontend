@@ -1,18 +1,40 @@
-import { Briefcase, Calendar, CheckCircle } from "lucide-react";
+import { Briefcase, Calendar, CheckCircle, Loader2 } from "lucide-react";
 import BarChart from "../../components/dashboard/BarChart";
-export default function DashboardPage() {
-  // Sample data for the chart
-  const chartData = {
-    labels: ["January", "February", "March", "April", "May", "June"],
-    datasets: [
-      {
-        label: "Applications",
-        data: [12, 19, 8, 15, 12, 18],
-        backgroundColor: "#2c4e85",
-      },
-    ],
-  };
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { fetchJobs } from "../../utils/job-api-client";
+import { useApplicationStore } from "../../store/store";
+import { useEffect } from "react";
+import useDashboardData from "../../hooks/useDashboardData";
 
+export default function DashboardPage() {
+  const { chartData, interviewCount, offerCount } = useDashboardData();
+  const { setApplication } = useApplicationStore();
+  const { data, isPending } = useQuery({
+    queryKey: ["fetch-jobs"],
+    queryFn: async () => {
+      return await fetchJobs();
+    },
+    select: (data) => data?.jobs,
+    staleTime: 60 * 1000 * 5, // 5 minutes
+    placeholderData: keepPreviousData,
+  });
+
+  useEffect(() => {
+    if (data) {
+      setApplication(data);
+    }
+  }, [data, setApplication]);
+
+  if (isPending) {
+    return (
+      <div className="w-full h-[770px] flex items-center justify-center">
+        <div className="flex flex-col justify-center items-center">
+          <Loader2 className="animate-spin size-14" color="#2c4e85" />
+          <p>Please wait while getting your jobs</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="space-y-6">
       <div>
@@ -27,7 +49,7 @@ export default function DashboardPage() {
             <Briefcase className="h-4 w-4 text-slate-500" />
           </div>
           <div className="p-4 pt-2">
-            <div className="text-2xl font-bold">42</div>
+            <div className="text-2xl font-bold">{data?.length}</div>
             <p className="text-xs text-slate-500">+12% from last month</p>
           </div>
         </div>
@@ -37,7 +59,7 @@ export default function DashboardPage() {
             <Calendar className="h-4 w-4 text-slate-500" />
           </div>
           <div className="p-4 pt-2">
-            <div className="text-2xl font-bold">8</div>
+            <div className="text-2xl font-bold">{interviewCount}</div>
             <p className="text-xs text-slate-500">+2 scheduled this week</p>
           </div>
         </div>
@@ -47,7 +69,7 @@ export default function DashboardPage() {
             <CheckCircle className="h-4 w-4 text-slate-500" />
           </div>
           <div className="p-4 pt-2">
-            <div className="text-2xl font-bold">2</div>
+            <div className="text-2xl font-bold">{offerCount}</div>
             <p className="text-xs text-slate-500">1 pending response</p>
           </div>
         </div>
