@@ -7,8 +7,10 @@ import AddJobPage from "./pages/dashboard/AddJobPage";
 import ProfilePage from "./pages/dashboard/ProfilePage";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
+import usePageTitle from "./utils/usePageTitle";
 
 function App() {
+  usePageTitle();
   return (
     <Routes>
       <Route index path="/" element={<Homepage />} />
@@ -16,8 +18,8 @@ function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/dashboard" element={<DashboardLayout />}>
         <Route index element={<DashboardPage />} />
-        <Route path="jobs" element={<JobsPage />} />
-        <Route path="add-job" element={<AddJobPage />} />
+        <Route path="applications" element={<JobsPage />} />
+        <Route path="add-application" element={<AddJobPage />} />
         <Route path="profile" element={<ProfilePage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

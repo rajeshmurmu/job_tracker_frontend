@@ -11,7 +11,7 @@ export function TopBar() {
           <span className="sr-only">Notifications</span>
         </button>
         <div className="flex items-center space-x-3">
-          <div className="h-9 w-9 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden cursor-pointer">
+          <div className="h-9 w-9 rounded-full bg-slate-200 border-slate-300 border-1 flex items-center justify-center overflow-hidden cursor-pointer">
             <img
               src={user?.avatar || "https://avatar.iran.liara.run/public/boy"}
               alt="User"

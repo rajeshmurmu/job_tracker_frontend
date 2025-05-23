@@ -9,7 +9,9 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import useUserStore from "../store/store";
 export default function Header() {
+  const { user } = useUserStore((state) => state);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   return (
     <>
@@ -41,18 +43,34 @@ export default function Header() {
               >
                 Testimonials
               </a>
-              <Link
-                to="/login"
-                className="ml-4 px-4 py-2 rounded-md text-sm font-medium text-white bg-[#2c4e85] hover:bg-[#254170] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2c4e85]"
-              >
-                Log In
-              </Link>
-              <Link
-                to="/login"
-                className="px-4 py-2 rounded-md text-sm font-medium text-[#2c4e85] border border-[#2c4e85] hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2c4e85]"
-              >
-                Sign Up
-              </Link>
+              {!user ? (
+                <>
+                  <Link
+                    to="/login"
+                    className="ml-4 px-4 py-2 rounded-md text-sm font-medium text-white bg-[#2c4e85] hover:bg-[#254170] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2c4e85]"
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    to="/login"
+                    className="px-4 py-2 rounded-md text-sm font-medium text-[#2c4e85] border border-[#2c4e85] hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2c4e85]"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/dashboard"
+                    className="ml-4 px-4 py-2 rounded-md text-sm font-medium text-white bg-[#2c4e85] hover:bg-[#254170] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2c4e85]"
+                  >
+                    Dashboard
+                  </Link>
+                  <button className="px-4 py-2 rounded-md text-sm font-medium text-[#2c4e85] border border-red-500 hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2c4e85] cursor-pointer">
+                    Logout
+                  </button>
+                </>
+              )}
             </div>
             <div className="md:hidden flex items-center">
               <button

@@ -104,7 +104,7 @@ export default function ProfilePage() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="p-4 space-y-6">
             <div className="flex flex-col items-center sm:flex-row sm:items-start gap-4">
-              <div className="h-24 w-24 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden">
+              <div className="h-24 w-24 rounded-full border-slate-300 border-1 bg-slate-200 flex items-center justify-center overflow-hidden">
                 <img
                   src={avatar || "https://avatar.iran.liara.run/public/boy"}
                   alt="Profile"
