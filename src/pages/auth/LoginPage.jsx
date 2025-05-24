@@ -8,6 +8,7 @@ import { vineResolver } from "../../utils/vine";
 import { loginSchema } from "../../utils/loginSchema";
 import { toast } from "react-toastify";
 import useUserStore from "../../store/store";
+import { queryClient } from "../../main";
 
 export default function LoginPage() {
   const { setUser, user } = useUserStore((state) => state);
@@ -43,6 +44,9 @@ export default function LoginPage() {
         refreshToken: data?.refreshToken,
       });
       toast.success(data?.message || "User logged in successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["fetch-jobs"],
+      });
       navigate("/dashboard", { replace: true });
     }
 
