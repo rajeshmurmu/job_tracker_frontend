@@ -23,9 +23,10 @@ export const registerUser = async (data) => {
   } catch (error) {
     if (error instanceof AxiosError) {
       console.log("Error registering user:", error);
-      return error.response.data;
+      throw new Error(error?.response?.data || "Failed to register user");
     }
     console.log("Error registering user:", error);
+    throw new Error(error?.message || "Failed to register user");
   }
 };
 
@@ -33,18 +34,18 @@ export const loginUser = async (data) => {
   try {
     const response = await authApi.post("/login", data);
 
-    if (response.data.success === false) {
-      throw new Error(response.data.message);
+    if (response?.data.success === false) {
+      throw new Error(response.data?.message);
     }
 
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
       console.log("Error login user:", error);
-      throw new Error(error.response.data.message || "Failed to login user");
+      throw new Error(error?.response?.data?.message || "Failed to login user");
     }
     console.log("Error login user:", error);
-    throw new Error(error.message || "Failed to login user");
+    throw new Error(error?.message || "Failed to login user");
   }
 };
 
@@ -52,18 +53,20 @@ export const logoutUser = async () => {
   try {
     const response = await authApi.post("/logout");
 
-    if (response.data.success === false) {
-      throw new Error(response.data.message);
+    if (response?.data.success === false) {
+      throw new Error(response.data?.message);
     }
 
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
       console.log("Error logout user:", error);
-      throw new Error(error.response.data.message || "Failed to logout user");
+      throw new Error(
+        error?.response?.data?.message || "Failed to logout user"
+      );
     }
     console.log("Error logout user:", error);
-    throw new Error(error.message || "Failed to logout user");
+    throw new Error(error?.message || "Failed to logout user");
   }
 };
 
@@ -72,16 +75,18 @@ export const refreshAccessToken = async () => {
     const response = await authApi.get("/refresh-token");
 
     if (response.data.success === false) {
-      throw new Error(response.data.message);
+      throw new Error(response?.data?.message);
     }
 
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
       console.log("Error refreshing access token:", error);
-      throw new Error(error.response.data.message || "Failed to refresh token");
+      throw new Error(
+        error?.response?.data?.message || "Failed to refresh token"
+      );
     }
     console.log("Error refreshing access token:", error);
-    throw new Error(error.message || "Failed to refresh token");
+    throw new Error(error?.message || "Failed to refresh token");
   }
 };

@@ -32,10 +32,6 @@ export default function LoginPage() {
     mutationFn: loginUser,
   });
 
-  const onSubmit = async (data) => {
-    mutate(data);
-  };
-
   useEffect(() => {
     if (isSuccess) {
       setUser({
@@ -93,7 +89,7 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-6">
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(mutate)}>
             <div className="space-y-4">
               <div className="space-y-2">
                 <label
