@@ -37,9 +37,7 @@ export function DashboardSidebar() {
 
   const { mutate, isSuccess, data } = useMutation({
     mutationKey: ["logout"],
-    mutationFn: () => {
-      return logoutUser();
-    },
+    mutationFn: logoutUser,
   });
 
   useEffect(() => {

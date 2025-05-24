@@ -1,9 +1,10 @@
 import axios, { AxiosError } from "axios";
+import _config from "../config/appConfig";
 
 axios.defaults.withCredentials = true;
 
 const authApi = axios.create({
-  baseURL: "http://localhost:5000/api/v1/users",
+  baseURL: `${_config.server_base_url}/api/v1/users`,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

@@ -6,7 +6,7 @@ import { AuthContext } from "./autheContext";
 import { refreshAccessToken } from "../../utils/auth-api-client";
 
 export default function AuthProvider({ children }) {
-  const { user } = useUserStore((state) => state);
+  const { user, resetUser } = useUserStore((state) => state);
   const [loading, setLoading] = useState(false);
 
   // Run once on mount
@@ -20,6 +20,7 @@ export default function AuthProvider({ children }) {
           "Token refresh failed:",
           err?.response?.data || err.message
         );
+        resetUser();
       } finally {
         setLoading(false);
       }

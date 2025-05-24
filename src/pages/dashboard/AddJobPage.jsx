@@ -139,7 +139,7 @@ export default function AddJobPage() {
                 </label>
                 <select
                   id="status"
-                  defaultValue="Applied"
+                  defaultValue="Saved"
                   {...register("status", { required: true })}
                   className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#2c4e85] focus:ring-1 focus:ring-[#2c4e85]"
                 >
@@ -147,9 +147,7 @@ export default function AddJobPage() {
                   <option value="Interview">Interview</option>
                   <option value="Offer">Offer</option>
                   <option value="Rejected">Rejected</option>
-                  <option value="Saved" selected>
-                    Saved
-                  </option>
+                  <option value="Saved">Saved</option>
                 </select>
 
                 {errors.location && (

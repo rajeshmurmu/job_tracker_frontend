@@ -1,9 +1,10 @@
 import axios, { AxiosError } from "axios";
+import _config from "../config/appConfig";
 
 axios.defaults.withCredentials = true;
 
 const authApi = axios.create({
-  baseURL: "http://localhost:5000/api/v1/auth",
+  baseURL: `${_config.server_base_url}/api/v1/auth`,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -40,9 +41,10 @@ export const loginUser = async (data) => {
   } catch (error) {
     if (error instanceof AxiosError) {
       console.log("Error login user:", error);
-      return error.response.data;
+      throw new Error(error.response.data.message || "Failed to login user");
     }
     console.log("Error login user:", error);
+    throw new Error(error.message || "Failed to login user");
   }
 };
 
@@ -58,9 +60,10 @@ export const logoutUser = async () => {
   } catch (error) {
     if (error instanceof AxiosError) {
       console.log("Error logout user:", error);
-      return error.response.data;
+      throw new Error(error.response.data.message || "Failed to logout user");
     }
     console.log("Error logout user:", error);
+    throw new Error(error.message || "Failed to logout user");
   }
 };
 
