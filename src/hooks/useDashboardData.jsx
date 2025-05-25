@@ -18,7 +18,7 @@ export default function useDashboardData() {
 
   const getApplicationsPerMonth = useCallback(() => {
     const counts = {};
-    applications.forEach(({ applied_date }) => {
+    applications?.forEach(({ applied_date }) => {
       const month = new Date(applied_date).toLocaleString("default", {
         month: "long",
       });
