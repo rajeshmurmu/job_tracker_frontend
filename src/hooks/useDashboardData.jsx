@@ -42,18 +42,18 @@ export default function useDashboardData() {
 
   useEffect(() => {
     const getInterviewsCount = () => {
-      const interviews = applications.filter(
+      const interviews = applications?.filter(
         (application) => application.status === "Interview"
       );
-      console.log(interviews);
+      // console.log(interviews);
       setInterviewCount(interviews.length);
     };
 
     const getOffersCount = () => {
-      const offers = applications.filter(
+      const offers = applications?.filter(
         (application) => application.status === "Offer"
       );
-      console.log(offers);
+      // console.log(offers);
       setOfferCount(offers.length);
     };
     getInterviewsCount();
