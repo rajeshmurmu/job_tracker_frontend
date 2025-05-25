@@ -46,7 +46,7 @@ export default function useDashboardData() {
         (application) => application.status === "Interview"
       );
       // console.log(interviews);
-      setInterviewCount(interviews.length);
+      setInterviewCount(interviews?.length);
     };
 
     const getOffersCount = () => {
@@ -54,7 +54,7 @@ export default function useDashboardData() {
         (application) => application.status === "Offer"
       );
       // console.log(offers);
-      setOfferCount(offers.length);
+      setOfferCount(offers?.length);
     };
     getInterviewsCount();
     getOffersCount();
