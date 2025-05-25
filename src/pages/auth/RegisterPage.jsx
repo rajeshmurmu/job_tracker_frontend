@@ -61,7 +61,7 @@ export default function RegisterPage() {
   }, [navigate, user]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-lg">
         <div className="space-y-1 text-center">
           <div className="flex items-center justify-center mb-2">

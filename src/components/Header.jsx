@@ -10,7 +10,7 @@ export default function Header() {
   const { user, resetUser } = useUserStore((state) => state);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const { mutate, isSuccess, data } = useMutation({
+  const { mutate, isSuccess, data, isPending } = useMutation({
     mutationKey: ["logout"],
     mutationFn: () => {
       return logoutUser();
@@ -82,6 +82,7 @@ export default function Header() {
                     Dashboard
                   </Link>
                   <button
+                    disabled={isPending}
                     className="px-4 py-2 rounded-md text-sm font-medium text-[#2c4e85] border border-red-500 hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2c4e85] cursor-pointer"
                     onClick={mutate}
                   >
@@ -107,43 +108,69 @@ export default function Header() {
         </div>
 
         {/* Mobile menu */}
-        <div className={`md:hidden ${mobileMenuOpen ? "block" : "hidden"}`}>
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a
-              href="#features"
-              className="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Features
-            </a>
-            <a
-              href="#how-it-works"
-              className="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              How It Works
-            </a>
-            <a
-              href="#testimonials"
-              className="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Testimonials
-            </a>
-            <Link
-              to="/login"
-              className="block px-3 py-2 rounded-md text-base font-medium text-white bg-[#2c4e85] hover:bg-[#254170]"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Log In
-            </Link>
-            <Link
-              to="/login"
-              className="block mt-2 px-3 py-2 rounded-md text-base font-medium text-[#2c4e85] border border-[#2c4e85] hover:bg-slate-50"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Sign Up
-            </Link>
+        <div className="relative">
+          <div
+            className={`md:hidden ${
+              mobileMenuOpen ? "block" : "hidden"
+            } absolute top-0 bg-white shadow-lg w-full z-[10] rounded-lg`}
+          >
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+              <a
+                href="#features"
+                className="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Features
+              </a>
+              <a
+                href="#how-it-works"
+                className="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                How It Works
+              </a>
+              <a
+                href="#testimonials"
+                className="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Testimonials
+              </a>
+              {!user ? (
+                <>
+                  <Link
+                    to="/login"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-white bg-[#2c4e85] hover:bg-[#254170]"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    to="/login"
+                    className="block mt-2 px-3 py-2 rounded-md text-base font-medium text-[#2c4e85] border border-[#2c4e85] hover:bg-slate-50"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Sign Up
+                  </Link>{" "}
+                </>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <Link
+                    to="/dashboard"
+                    className="w-full text-center px-4 py-2.5 rounded-md text-sm font-medium text-white bg-[#2c4e85] hover:bg-[#254170] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2c4e85]"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    disabled={isPending}
+                    className="w-full px-4 py-2 rounded-md text-sm font-medium text-[#2c4e85] border border-red-500 hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2c4e85] cursor-pointer"
+                    onClick={mutate}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>

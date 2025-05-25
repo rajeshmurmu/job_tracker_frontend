@@ -50,7 +50,9 @@ export default function DashboardPage() {
           </div>
           <div className="p-4 pt-2">
             <div className="text-2xl font-bold">{data?.length}</div>
-            <p className="text-xs text-slate-500">+12% from last month</p>
+            {data?.length > 0 && (
+              <p className="text-xs text-slate-500">+12% from last month</p>
+            )}
           </div>
         </div>
         <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
@@ -60,7 +62,9 @@ export default function DashboardPage() {
           </div>
           <div className="p-4 pt-2">
             <div className="text-2xl font-bold">{interviewCount}</div>
-            <p className="text-xs text-slate-500">+2 scheduled this week</p>
+            {interviewCount > 0 && (
+              <p className="text-xs text-slate-500">+2 scheduled this week</p>
+            )}
           </div>
         </div>
         <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
@@ -70,7 +74,9 @@ export default function DashboardPage() {
           </div>
           <div className="p-4 pt-2">
             <div className="text-2xl font-bold">{offerCount}</div>
-            <p className="text-xs text-slate-500">1 pending response</p>
+            {offerCount > 0 && (
+              <p className="text-xs text-slate-500">1 pending response</p>
+            )}
           </div>
         </div>
       </div>

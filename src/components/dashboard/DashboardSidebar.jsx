@@ -35,7 +35,7 @@ export function DashboardSidebar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  const { mutate, isSuccess, data } = useMutation({
+  const { mutate, isSuccess, data, isPending } = useMutation({
     mutationKey: ["logout"],
     mutationFn: logoutUser,
   });
@@ -74,10 +74,12 @@ export function DashboardSidebar() {
         >
           <div className="h-full flex flex-col">
             <div className="flex items-center justify-between p-4 border-b border-[#254170]">
-              <h2 className="text-xl font-bold text-white flex items-center">
-                <Briefcase className="mr-2 h-6 w-6" />
-                Job Tracker
-              </h2>
+              <Link to={"/"}>
+                <h2 className="text-xl font-bold text-white flex items-center">
+                  <Briefcase className="mr-2 h-6 w-6" />
+                  Job Tracker
+                </h2>
+              </Link>
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-white hover:text-slate-200"
@@ -145,6 +147,7 @@ export function DashboardSidebar() {
           </div>
           <div className="p-4 border-t border-[#254170]">
             <button
+              disabled={isPending}
               className="w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-[#254170] transition-colors"
               onClick={mutate}
             >

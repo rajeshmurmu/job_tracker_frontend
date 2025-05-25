@@ -15,8 +15,8 @@ export default function SortDropDown({ sortBy, setSortBy }) {
           }, 200)
         }
       >
-        <div className="flex items-center">
-          <ArrowUpDown className="mr-2 h-4 w-4" />
+        <div className="flex items-center ">
+          <ArrowUpDown className="mr-2 h-4 w-4 hidden md:block" />
           <span>Sort by {sortBy}</span>
         </div>
         <ChevronDown className="h-4 w-4 ml-2" />

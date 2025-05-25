@@ -26,7 +26,7 @@ export default function Homepage() {
                 opportunity again.
               </p>
               <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+                <div className="flex sm:flex-row gap-3 sm:gap-4 justify-start">
                   <Link
                     to="/login"
                     className="px-6 py-3 rounded-md text-base font-medium text-white bg-[#2c4e85] hover:bg-[#254170] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2c4e85]"
