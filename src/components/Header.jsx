@@ -4,7 +4,8 @@ import { Briefcase, Menu, X } from "lucide-react";
 import useUserStore from "../store/store";
 import { toast } from "react-toastify";
 import { logoutUser } from "../utils/auth-api-client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { fetchUser } from "../utils/user-api-client";
 export default function Header() {
   const navigate = useNavigate();
   const { user, resetUser } = useUserStore((state) => state);
@@ -22,6 +23,22 @@ export default function Header() {
       navigate("/login", { replace: true });
     }
   }, [data, data?.message, isSuccess, navigate, resetUser]);
+
+  const { setUser } = useUserStore();
+  const { data: userData, isSuccess: isSuccessUser } = useQuery({
+    queryKey: ["user"],
+    queryFn: fetchUser,
+    select: (data) => data?.user,
+    staleTime: 60 * 1000 * 5, // 5 minutes
+    refetchOnMount: true,
+  });
+
+  useEffect(() => {
+    if (isSuccessUser && userData) {
+      setUser(userData);
+    }
+  }, [isSuccessUser, setUser, userData]);
+
   return (
     <>
       <header className="bg-white border-b border-slate-200">

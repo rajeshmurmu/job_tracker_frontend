@@ -18,10 +18,11 @@ export default function Homepage() {
     queryFn: fetchUser,
     select: (data) => data?.user,
     staleTime: 60 * 1000 * 5, // 5 minutes
+    refetchOnMount: true,
   });
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccess && data) {
       setUser(data);
     }
   }, [isSuccess, data, setUser]);
