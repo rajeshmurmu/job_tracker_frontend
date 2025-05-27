@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import _config from "../../config/appConfig";
 
-export default function JobsPagination({
+export default function ApplicationsPagination({
   totalPages,
   currentPage,
   setCurrentPage,

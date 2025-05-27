@@ -73,3 +73,23 @@ export const uploadAvatar = async (data) => {
     throw new Error(error.message || "Error occured while updating user");
   }
 };
+
+export const deleteAvatar = async () => {
+  try {
+    const response = await authApi.delete("/me/avatar");
+
+    if (response.data.success === false) {
+      throw new Error(response.data.message);
+    }
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.log("Error deleting avatar:", error);
+      throw new Error(
+        error?.response?.data?.message || "Error occured while deleting avatar"
+      );
+    }
+    console.log("Error deleting avatar:", error);
+    throw new Error(error?.message || "Error occured while deleting avatar");
+  }
+};

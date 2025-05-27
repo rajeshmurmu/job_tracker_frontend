@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import { Briefcase, FilePlus, Home, LogOut, Menu, User, X } from "lucide-react";
 import useUserStore from "../../store/store";
 import { useMutation } from "@tanstack/react-query";
@@ -31,7 +31,7 @@ const navItems = [
 
 export function DashboardSidebar() {
   const { resetUser } = useUserStore((state) => state);
-  const location = useLocation();
+  // const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -91,16 +91,16 @@ export function DashboardSidebar() {
               <ul className="space-y-2">
                 {navItems.map((item) => (
                   <li key={item.href}>
-                    <Link
+                    <NavLink
                       to={item.href}
-                      className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-[#254170] transition-colors ${
-                        location.pathname === item.href ? "bg-[#254170]" : ""
-                      }`}
+                      className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-[#254170] transition-colors ${({
+                        isActive,
+                      }) => (isActive ? "bg-[#254170]" : "")}`}
                       onClick={() => setIsOpen(false)}
                     >
                       <item.icon className="h-5 w-5" />
                       {item.title}
-                    </Link>
+                    </NavLink>
                   </li>
                 ))}
               </ul>

@@ -13,7 +13,13 @@ export function TopBar() {
         <div className="flex items-center space-x-3">
           <div className="h-9 w-9 rounded-full bg-slate-200 border-slate-300 border-1 flex items-center justify-center overflow-hidden cursor-pointer">
             <img
-              src={user?.avatar || "https://avatar.iran.liara.run/public/boy"}
+              src={
+                user?.avatar ||
+                `https://avatar.iran.liara.run/username?username=${user?.name?.replace(
+                  " ",
+                  "+"
+                )}`
+              }
               alt="User"
               className="h-full w-full object-cover"
               // onError={(e) => {

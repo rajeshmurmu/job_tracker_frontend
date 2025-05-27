@@ -3,15 +3,20 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import useUserStore from "../../store/store";
 import { useMutation } from "@tanstack/react-query";
-import { updateUser, uploadAvatar } from "../../utils/user-api-client";
+import {
+  deleteAvatar,
+  updateUser,
+  uploadAvatar,
+} from "../../utils/user-api-client";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 import { vineResolver } from "../../utils/vine";
 import { updateSchema } from "../../utils/updateSchema";
+import { queryClient } from "../../main";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const { user, resetUser } = useUserStore((state) => state);
+  const { user, resetUser, setUser } = useUserStore((state) => state);
   const [avatar, setAvatar] = useState(user?.avatar);
   const avatarInputRef = useRef(null);
 
@@ -33,6 +38,18 @@ export default function ProfilePage() {
   const { mutate, data, isPending, isSuccess, isError, error } = useMutation({
     mutationKey: ["upload-avatar"],
     mutationFn: uploadAvatar,
+  });
+
+  const {
+    mutate: deleteAvatarMutate,
+    data: deleteAvatarData,
+    isSuccess: isSuccessDeleteAvatar,
+    isError: isErrorDeleteAvatar,
+    error: deleteAvatarError,
+    isPending: isPendingDeleteAvatar,
+  } = useMutation({
+    mutationKey: ["delete-avatar"],
+    mutationFn: deleteAvatar,
   });
 
   const {
@@ -60,31 +77,56 @@ export default function ProfilePage() {
     if (isSuccess) {
       toast.success(data?.message || "Avatar updated successfully");
       setAvatar(data?.avatar); // Update the avatar state with the new avatar;
+      setUser(data?.user);
     }
 
     if (isError) {
       toast.error(error?.message || "Something went wrong");
     }
-  }, [data, error, isError, isSuccess]);
+  }, [data, error, isError, isSuccess, setUser]);
 
   useEffect(() => {
     if (isSuccessUpdate) {
-      toast.success(updateData?.message || "Avatar updated successfully");
-      resetUser();
-      navigate("/login", { replace: true });
+      toast.success(updateData?.message || "User updated successfully");
+      setAvatar(updateData?.user?.avatar);
+      setUser(updateData?.user);
     }
 
     if (isErrorUpdate) {
       toast.error(updateError?.message || "Something went wrong");
     }
+    queryClient.invalidateQueries({ queryKey: ["me"] });
   }, [
     isErrorUpdate,
     isSuccess,
     isSuccessUpdate,
     navigate,
     resetUser,
+    setUser,
     updateData,
     updateError,
+  ]);
+
+  useEffect(() => {
+    if (isSuccessDeleteAvatar) {
+      toast.success(deleteAvatarData?.message || "Avatar deleted successfully");
+      setAvatar(deleteAvatarData?.user?.avatar);
+      setUser(deleteAvatarData?.user);
+    }
+
+    if (isErrorDeleteAvatar) {
+      toast.error(deleteAvatarError?.message || "Something went wrong");
+    }
+
+    queryClient.invalidateQueries({ queryKey: ["me"] });
+  }, [
+    deleteAvatarData,
+    deleteAvatarError,
+    isErrorDeleteAvatar,
+    isSuccessDeleteAvatar,
+    navigate,
+    resetUser,
+    setUser,
   ]);
 
   return (
@@ -104,11 +146,23 @@ export default function ProfilePage() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="p-4 space-y-6">
             <div className="flex flex-col items-center sm:flex-row sm:items-start gap-4">
-              <div className="h-24 w-24 rounded-full border-slate-300 border-1 bg-slate-200 flex items-center justify-center overflow-hidden">
+              <div className="relative h-24 w-24 rounded-full border-slate-300 border-1 bg-slate-200 flex items-center justify-center overflow-hidden">
+                {(isPending || isPendingDeleteAvatar) && (
+                  <div className="absolute inset-0 bg-slate-900/40 flex justify-center items-center">
+                    <Loader2 className="animate-spin size-14" color="#2c4e85" />
+                  </div>
+                )}
                 <img
-                  src={avatar || "https://avatar.iran.liara.run/public/boy"}
+                  src={
+                    avatar ||
+                    `https://avatar.iran.liara.run/username?username=${user?.name?.replace(
+                      " ",
+                      "+"
+                    )}`
+                  }
+                  onClick={() => avatarInputRef.current.click()}
                   alt="Profile"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover cursor-pointer"
                 />
               </div>
               <div className="flex flex-col items-center sm:items-start gap-2">
@@ -126,6 +180,7 @@ export default function ProfilePage() {
                   />
                   <button
                     type="button"
+                    disabled={isPending || isPendingDeleteAvatar}
                     className="px-3 py-1 text-sm border border-slate-300 rounded-md hover:bg-slate-50 cursor-pointer"
                     onClick={() => avatarInputRef.current.click()}
                   >
@@ -134,7 +189,11 @@ export default function ProfilePage() {
 
                   <button
                     type="button"
-                    className="px-3 py-1 text-sm border border-slate-300 rounded-md hover:bg-slate-50"
+                    disabled={
+                      isPendingDeleteAvatar || !user?.avatar || isPending
+                    }
+                    className="px-3 py-1 text-sm border border-slate-300 rounded-md hover:bg-slate-50 cursor-pointer"
+                    onClick={() => deleteAvatarMutate(user?.avatar)}
                   >
                     Remove
                   </button>

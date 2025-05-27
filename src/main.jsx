@@ -9,11 +9,11 @@ import AuthProvider from "./store/contexts/AuthProvider";
 export const queryClient = new QueryClient();
 createRoot(document.getElementById("root")).render(
   <AuthProvider>
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <App />
-        <ToastContainer />
-      </QueryClientProvider>
-    </BrowserRouter>
+    {/* <BrowserRouter> */}
+    <QueryClientProvider client={queryClient}>
+      <App />
+      <ToastContainer />
+    </QueryClientProvider>
+    {/* </BrowserRouter> */}
   </AuthProvider>
 );

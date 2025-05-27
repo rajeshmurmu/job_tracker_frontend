@@ -6,13 +6,13 @@ import { useForm } from "react-hook-form";
 import DatePicker from "../../components/dashboard/DatePicker";
 import { Loader2 } from "lucide-react";
 import { vineResolver } from "../../utils/vine";
-import { jobSchema } from "../../utils/jobSchema";
-import { QueryClient, useMutation } from "@tanstack/react-query";
-import { createJob } from "../../utils/job-api-client";
+import { applicationSchema } from "../../utils/applicationSchema";
+import { useMutation } from "@tanstack/react-query";
+import { createApplication } from "../../utils/application-api-client";
 import { toast } from "react-toastify";
 import { queryClient } from "../../main";
 
-export default function AddJobPage() {
+export default function AddApplicationPage() {
   const navigate = useNavigate();
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
 
@@ -33,18 +33,18 @@ export default function AddJobPage() {
       job_url: "",
       notes: "",
     },
-    resolver: vineResolver(jobSchema),
+    resolver: vineResolver(applicationSchema),
   });
 
   const { mutate, data, isPending, isSuccess, isError, error } = useMutation({
-    mutationFn: createJob,
+    mutationFn: createApplication,
   });
 
   useEffect(() => {
     if (isSuccess) {
       reset();
-      queryClient.invalidateQueries(["fetch-jobs"]);
-      toast.success(data?.message || "Job created successfully");
+      queryClient.invalidateQueries({ queryKey: ["applications"] });
+      toast.success(data?.message || "Application added successfully");
       navigate("/dashboard", { replace: true });
     }
 

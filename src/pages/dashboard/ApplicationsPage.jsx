@@ -2,23 +2,40 @@ import { useCallback, useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import StatusFilterDropDown from "../../components/dashboard/StatusFilterDropDown";
 import SortDropDown from "../../components/dashboard/SortDropDown";
-import JobsPagination from "../../components/dashboard/JobsPagination";
-import { useSearchParams } from "react-router";
+import ApplicationsPagination from "../../components/dashboard/ApplicationsPagination";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import _config from "../../config/appConfig";
 import { useApplicationStore } from "../../store/store";
+import { useMutation } from "@tanstack/react-query";
+import { deleteApplication } from "../../utils/application-api-client";
+import { toast } from "react-toastify";
+import { queryClient } from "../../main";
+import NetworkLoading from "../../components/NetworkLoading";
 
-export default function JobsPage() {
+export default function ApplicationsPage() {
+  const navigate = useNavigate();
   const { applications } = useApplicationStore();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
-  const [filteredJobs, setFilteredJobs] = useState([]);
+  const [filteredApplications, setFilteredApplications] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const page = Number(searchParams.get("page")) || 1;
 
-  const filterAndSortJobs = useCallback(() => {
+  const {
+    mutate: deleteApplicationMutate,
+    data: deleteApplicationData,
+    isError: isDeleteApplicationError,
+    error: deleteApplicationError,
+    isLoading: isDeleteApplicationLoading,
+    isSuccess: isDeleteApplicationSuccess,
+  } = useMutation({
+    mutationFn: deleteApplication,
+  });
+
+  const filterAndSortApplications = useCallback(() => {
     // Filter and sort jobs
     const result = applications
       ?.filter((job) => {
@@ -48,14 +65,14 @@ export default function JobsPage() {
       });
 
     // reset all state values and set filtered jobs
-    setFilteredJobs(result);
-    setTotalPages(Math.ceil(result?.length / _config.jobs_per_page));
+    setFilteredApplications(result);
+    setTotalPages(Math.ceil(result?.length / _config.applications_per_page));
     setCurrentPage(1);
   }, [applications, searchTerm, sortBy, statusFilter]);
 
   useEffect(() => {
-    filterAndSortJobs();
-  }, [searchTerm, sortBy, statusFilter, filterAndSortJobs]);
+    filterAndSortApplications();
+  }, [searchTerm, sortBy, statusFilter, filterAndSortApplications]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -78,6 +95,28 @@ export default function JobsPage() {
       return prev;
     });
   }, [currentPage, page, setSearchParams]);
+
+  useEffect(() => {
+    if (isDeleteApplicationSuccess && deleteApplicationData) {
+      toast.success(
+        deleteApplicationData?.message || "Application deleted successfully"
+      );
+      queryClient.invalidateQueries({ queryKey: ["applications"] });
+      navigate("/dashboard");
+    }
+
+    if (isDeleteApplicationError && deleteApplicationError) {
+      toast.error(
+        deleteApplicationError?.message || "Error while deleting application"
+      );
+    }
+  }, [
+    deleteApplicationData,
+    deleteApplicationError,
+    isDeleteApplicationError,
+    isDeleteApplicationSuccess,
+    navigate,
+  ]);
 
   return (
     <div className="space-y-6">
@@ -117,7 +156,7 @@ export default function JobsPage() {
           </div>
 
           {/* Jobs Table */}
-          <div className="rounded-md border border-slate-200 overflow-hidden">
+          <div className="rounded-md border border-slate-200 overflow-hidden overflow-x-auto">
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50">
                 <tr>
@@ -151,13 +190,19 @@ export default function JobsPage() {
                   >
                     Applied Date
                   </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider md:table-cell"
+                  >
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-slate-200">
-                {filteredJobs
+                {filteredApplications
                   ?.slice(
-                    (page - 1) * _config.jobs_per_page,
-                    page * _config.jobs_per_page
+                    (page - 1) * _config.applications_per_page,
+                    page * _config.applications_per_page
                   )
                   .map((job) => (
                     <tr key={job?._id} className="hover:bg-slate-50">
@@ -182,9 +227,34 @@ export default function JobsPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 hidden md:table-cell">
                         {new Date(job?.applied_date).toLocaleDateString()}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap  text-sm font-medium">
+                        <div className="flex gap-2">
+                          <Link
+                            to={`/dashboard/applications/${job?._id}`}
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            View
+                          </Link>
+
+                          <Link
+                            to={`/dashboard/applications/${job?._id}/edit`}
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            Edit
+                          </Link>
+
+                          <button
+                            disabled={isDeleteApplicationLoading}
+                            onClick={() => deleteApplicationMutate(job?._id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
-                {filteredJobs?.length === 0 && (
+                {filteredApplications?.length === 0 && (
                   <tr>
                     <td
                       colSpan={5}
@@ -199,18 +269,18 @@ export default function JobsPage() {
           </div>
 
           {/* Pagination */}
-          <JobsPagination
+          <ApplicationsPagination
             totalPages={totalPages}
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
           />
-          {/* {data?.jobs?.length > _config.jobs_per_page &&
+          {/* {data?.jobs?.length > _config.applications_per_page &&
             statusFilter === "All" && (
-              <JobsPagination filteredJobs={data?.jobs} />
+              <JobsPagination filteredApplications={data?.jobs} />
             )}
 
-          {filteredJobs?.length > 0 && statusFilter !== "All" && (
-            <JobsPagination filteredJobs={filteredJobs} />
+          {filteredApplications?.length > 0 && statusFilter !== "All" && (
+            <JobsPagination filteredApplications={filteredApplications} />
           )} */}
         </div>
       </div>

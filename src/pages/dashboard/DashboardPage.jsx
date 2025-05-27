@@ -1,7 +1,7 @@
 import { Briefcase, Calendar, CheckCircle, Loader2 } from "lucide-react";
 import BarChart from "../../components/dashboard/BarChart";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { fetchJobs } from "../../utils/job-api-client";
+import { fetchApplications } from "../../utils/application-api-client";
 import { useApplicationStore } from "../../store/store";
 import { useEffect } from "react";
 import useDashboardData from "../../hooks/useDashboardData";
@@ -10,11 +10,9 @@ export default function DashboardPage() {
   const { chartData, interviewCount, offerCount } = useDashboardData();
   const { setApplication } = useApplicationStore();
   const { data, isPending } = useQuery({
-    queryKey: ["fetch-jobs"],
-    queryFn: async () => {
-      return await fetchJobs();
-    },
-    select: (data) => data?.jobs,
+    queryKey: ["applications"],
+    queryFn: fetchApplications,
+    select: (data) => data?.applications,
     staleTime: 60 * 1000 * 5, // 5 minutes
     placeholderData: keepPreviousData,
   });
@@ -30,7 +28,7 @@ export default function DashboardPage() {
       <div className="w-full h-[770px] flex items-center justify-center">
         <div className="flex flex-col justify-center items-center">
           <Loader2 className="animate-spin size-14" color="#2c4e85" />
-          <p>Please wait while getting your jobs</p>
+          <p>Please wait while getting your applications</p>
         </div>
       </div>
     );

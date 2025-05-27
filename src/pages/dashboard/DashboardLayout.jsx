@@ -1,19 +1,8 @@
-import { Outlet, useNavigate } from "react-router";
+import { Outlet } from "react-router";
 import { DashboardSidebar } from "../../components/dashboard/DashboardSidebar";
 import { TopBar } from "../../components/dashboard/TopBar";
-import useUserStore from "../../store/store";
-import { useEffect } from "react";
 
-export function DashboardLayout() {
-  const { user } = useUserStore((state) => state);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!user) {
-      return navigate("/login", { replace: true });
-    }
-  }, [navigate, user]);
-
+export default function DashboardLayout() {
   return (
     <div className="flex h-screen bg-slate-50">
       <DashboardSidebar />

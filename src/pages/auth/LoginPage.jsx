@@ -34,14 +34,10 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isSuccess) {
-      setUser({
-        ...data?.user,
-        accessToken: data?.accessToken,
-        refreshToken: data?.refreshToken,
-      });
+      setUser(data?.user);
       toast.success(data?.message || "User logged in successfully");
       queryClient.invalidateQueries({
-        queryKey: ["fetch-jobs"],
+        queryKey: ["applications"],
       });
       navigate("/dashboard", { replace: true });
     }
@@ -105,6 +101,11 @@ export default function LoginPage() {
                   {...register("email")}
                   className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#2c4e85] focus:ring-1 focus:ring-[#2c4e85]"
                 />
+                {errors?.email?.message && (
+                  <p className="text-xs text-red-500">
+                    {errors.email?.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -128,11 +129,8 @@ export default function LoginPage() {
                   className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#2c4e85] focus:ring-1 focus:ring-[#2c4e85]"
                 />
               </div>
-              {errors?.email?.message && (
-                <p className="text-sm text-red-500">{errors.email?.message}</p>
-              )}
               {errors?.password?.message && (
-                <p className="text-sm text-red-500">
+                <p className="text-xs text-red-500">
                   {errors.password?.message}
                 </p>
               )}

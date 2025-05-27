@@ -12,9 +12,7 @@ export default function Header() {
 
   const { mutate, isSuccess, data, isPending } = useMutation({
     mutationKey: ["logout"],
-    mutationFn: () => {
-      return logoutUser();
-    },
+    mutationFn: logoutUser,
   });
 
   useEffect(() => {

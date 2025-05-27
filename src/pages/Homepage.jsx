@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { dashboard } from "../assets/images";
 import {
   Briefcase,
@@ -8,7 +8,24 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Link } from "react-router";
+import { useQuery } from "@tanstack/react-query";
+import { fetchUser } from "../utils/user-api-client";
+import useUserStore from "../store/store";
 export default function Homepage() {
+  const { setUser } = useUserStore();
+  const { data, isSuccess } = useQuery({
+    queryKey: ["user"],
+    queryFn: fetchUser,
+    select: (data) => data?.user,
+    staleTime: 60 * 1000 * 5, // 5 minutes
+  });
+
+  useEffect(() => {
+    if (isSuccess) {
+      setUser(data);
+    }
+  }, [isSuccess, data, setUser]);
+
   return (
     <>
       {/* Hero Section */}
