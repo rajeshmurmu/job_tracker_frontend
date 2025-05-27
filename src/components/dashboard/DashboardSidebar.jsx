@@ -35,7 +35,14 @@ export function DashboardSidebar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  const { mutate, isSuccess, data, isPending } = useMutation({
+  const {
+    mutate,
+    isSuccess,
+    data,
+    isPending,
+    isError: isLogoutError,
+    error: logoutError,
+  } = useMutation({
     mutationKey: ["logout"],
     mutationFn: logoutUser,
   });
@@ -46,7 +53,19 @@ export function DashboardSidebar() {
       resetUser();
       navigate("/login", { replace: true });
     }
-  }, [data, data?.message, isSuccess, navigate, resetUser]);
+
+    if (isLogoutError || logoutError) {
+      resetUser();
+    }
+  }, [
+    data,
+    data?.message,
+    isLogoutError,
+    isSuccess,
+    logoutError,
+    navigate,
+    resetUser,
+  ]);
 
   return (
     <>

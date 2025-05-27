@@ -26,6 +26,7 @@ export const fetchUser = async () => {
       return error.response.data;
     }
     console.log("Error fetching user:", error);
+    throw new Error(error?.message || "Error occured while fetching user");
   }
 };
 
@@ -42,11 +43,11 @@ export const updateUser = async (data) => {
     if (error instanceof AxiosError) {
       console.log("Error updating user:", error);
       throw new Error(
-        error.response.data.message || "Error occured while updating user"
+        error?.response?.data?.message || "Error occured while updating user"
       );
     }
     console.log("Error updating user:", error);
-    throw new Error(error.message || "Error occured while updating user");
+    throw new Error(error?.message || "Error occured while updating user");
   }
 };
 
@@ -66,11 +67,11 @@ export const uploadAvatar = async (data) => {
     if (error instanceof AxiosError) {
       console.log("Error updating user:", error);
       throw new Error(
-        error.response.data.message || "Error occured while updating user"
+        error?.response?.data?.message || "Error occured while updating user"
       );
     }
     console.log("Error updating user:", error);
-    throw new Error(error.message || "Error occured while updating user");
+    throw new Error(error?.message || "Error occured while updating user");
   }
 };
 

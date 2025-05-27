@@ -11,7 +11,14 @@ export default function Header() {
   const { user, resetUser } = useUserStore((state) => state);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const { mutate, isSuccess, data, isPending } = useMutation({
+  const {
+    mutate,
+    isSuccess,
+    data,
+    isPending,
+    isError: isLogoutError,
+    error: logoutError,
+  } = useMutation({
     mutationKey: ["logout"],
     mutationFn: logoutUser,
   });
@@ -22,7 +29,19 @@ export default function Header() {
       resetUser();
       navigate("/login", { replace: true });
     }
-  }, [data, data?.message, isSuccess, navigate, resetUser]);
+
+    if (isLogoutError || logoutError) {
+      resetUser();
+    }
+  }, [
+    data,
+    data?.message,
+    isLogoutError,
+    isSuccess,
+    logoutError,
+    navigate,
+    resetUser,
+  ]);
 
   const { setUser } = useUserStore();
   const { data: userData, isSuccess: isSuccessUser } = useQuery({
