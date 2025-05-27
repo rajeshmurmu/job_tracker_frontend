@@ -10,7 +10,8 @@ import { useMutation } from "@tanstack/react-query";
 import { deleteApplication } from "../../utils/application-api-client";
 import { toast } from "react-toastify";
 import { queryClient } from "../../main";
-import NetworkLoading from "../../components/NetworkLoading";
+import { saveAs } from "file-saver";
+import Papa from "papaparse";
 
 export default function ApplicationsPage() {
   const navigate = useNavigate();
@@ -118,11 +119,29 @@ export default function ApplicationsPage() {
     navigate,
   ]);
 
+  function exportToCSV(data) {
+    const csv = Papa.unparse(data);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    saveAs(blob, "job-applications.csv");
+  }
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">All Jobs</h1>
-        <p className="text-slate-500">Manage and track your job applications</p>
+      <div className="flex md:items-center flex-col gap-y-2 md:flex-row justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">All Jobs</h1>
+          <p className="text-slate-500">
+            Manage and track your job applications
+          </p>
+        </div>
+        <div className="export">
+          <button
+            className="btn px-4 rounded-md py-2 cursor-pointer bg-[#2c4e85] text-white hover:bg-[#2c4e85] hover:text-white"
+            onClick={() => exportToCSV(applications)}
+          >
+            Export CSV
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg border border-slate-200 shadow-sm">

@@ -1,10 +1,4 @@
-import {
-  createBrowserRouter,
-  Navigate,
-  Route,
-  RouterProvider,
-  Routes,
-} from "react-router";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
 import DashboardLayout from "./pages/dashboard/DashboardLayout";
 import Homepage from "./pages/Homepage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
