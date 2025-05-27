@@ -41,12 +41,12 @@ export function DashboardSidebar() {
   });
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccess && data) {
       toast.success(data?.message || "User logged out successfully");
       resetUser();
       navigate("/login", { replace: true });
     }
-  }, [data?.message, isSuccess, navigate, resetUser]);
+  }, [data, data?.message, isSuccess, navigate, resetUser]);
 
   return (
     <>
